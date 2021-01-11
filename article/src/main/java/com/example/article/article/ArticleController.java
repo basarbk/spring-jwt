@@ -2,18 +2,16 @@ package com.example.article.article;
 
 import java.util.List;
 
+import com.example.article.config.AppUser;
+import com.example.article.config.LoggedInUser;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
-
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtParser;
-import io.jsonwebtoken.Jwts;
 
 @RestController
 public class ArticleController {
@@ -27,15 +25,9 @@ public class ArticleController {
   }
 
   @PostMapping("/api/1.0/articles")
-  Article saveArticle(@RequestBody Article article, @RequestHeader(name = "Authorization") String authorization){
-    String token = authorization.substring(7);
-    JwtParser parser = Jwts.parser().setSigningKey("my-app-secret");
-    parser.parse(token);
-    Claims claims = parser.parseClaimsJws(token).getBody();
-    String username = (String) claims.get("username");
-    Long userId = Long.valueOf((String)claims.get("id"));
-    article.setUserId(userId);
-    article.setUsername(username);
+  Article saveArticle(@RequestBody Article article, @LoggedInUser AppUser appUser){
+    article.setUserId(appUser.getUserId());
+    article.setUsername(appUser.getUsername());
     return articleService.save(article);
   }
 
