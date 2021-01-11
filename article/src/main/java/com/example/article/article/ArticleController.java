@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 
@@ -30,6 +31,11 @@ public class ArticleController {
     String token = authorization.substring(7);
     JwtParser parser = Jwts.parser().setSigningKey("my-app-secret");
     parser.parse(token);
+    Claims claims = parser.parseClaimsJws(token).getBody();
+    String username = (String) claims.get("username");
+    Long userId = Long.valueOf((String)claims.get("id"));
+    article.setUserId(userId);
+    article.setUsername(username);
     return articleService.save(article);
   }
 

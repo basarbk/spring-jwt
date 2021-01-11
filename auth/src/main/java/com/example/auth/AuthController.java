@@ -36,7 +36,7 @@ public class AuthController {
 		
 		User user = optional.get();
 
-		String token = Jwts.builder().
+    String token = Jwts.builder().
 			claim("username", user.getUsername()).
 			claim("id", ""+user.getId()).
 			signWith(SignatureAlgorithm.HS512, "my-app-secret").compact();
