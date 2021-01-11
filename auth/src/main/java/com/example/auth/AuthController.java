@@ -2,6 +2,7 @@ package com.example.auth;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,12 +35,16 @@ public class AuthController {
 		if(!optional.isPresent())
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.singletonMap("message", "Invalid creds"));
 		
-		User user = optional.get();
+    User user = optional.get();
+    
+    Date expiresAt = new Date(System.currentTimeMillis() + 20*1000);
 
     String token = Jwts.builder().
 			claim("username", user.getUsername()).
-			claim("id", ""+user.getId()).
-			signWith(SignatureAlgorithm.HS512, "my-app-secret").compact();
+      claim("id", ""+user.getId()).
+      signWith(SignatureAlgorithm.HS512, "my-app-secret").
+      setExpiration(expiresAt).
+      compact();
 
 		return ResponseEntity.ok(Collections.singletonMap("token", token));
 	}
